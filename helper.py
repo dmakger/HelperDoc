@@ -134,9 +134,13 @@ class Helper:
         if (qualification_id == -1) or (education_program_id == -1):
             return -1
 
+        try:
+            birth_date = row[21].strftime("%d.%m.%Y")
+        except Exception:
+            birth_date = row[21]
         if is_form_list:
             return [
-                row[19], row[18], row[20], row[21].strftime("%d.%m.%Y"),
+                row[19], row[18], row[20], birth_date,
                 row[22], row[23], row[24], row[25], row[26], row[27], row[15],
                 row[16], row[17], row[11], qualification_id, education_program_id,
             ]
@@ -145,7 +149,7 @@ class Helper:
             'name': row[19],
             'last_name': row[18],
             'middle_name': row[20],
-            'birth_date': row[21].strftime("%d.%m.%Y"),
+            'birth_date': birth_date,
             'gender': row[22],
             'snills': row[23],
             'country_code': row[24],
@@ -212,10 +216,15 @@ class Helper:
         if student_id == -1:
             return -1
 
+        try:
+            issue_date = row[9].strftime("%d.%m.%Y")
+        except Exception:
+            issue_date = row[9]
+
         if is_form_list:
             return [
                 row[0], row[1], row[7], row[8], row[3],
-                row[4], row[5], row[6], row[9].strftime("%d.%m.%Y"), row[10],
+                row[4], row[5], row[6], issue_date, row[10],
                 row[2], student_id,
             ]
 
@@ -228,7 +237,7 @@ class Helper:
             'exchange_confirmation': row[4],
             'destruction_confirmation': row[5],
             'education_level': row[6],
-            'issue_date': row[9].strftime("%d.%m.%Y"),
+            'issue_date': issue_date,
             'registration_number': row[10],
             'status': row[2],
             'student_id': student_id,
@@ -264,6 +273,7 @@ class Helper:
         return is_added
 
     def del_document_bd(self, row):
+        print("qwe")
         data = self.get_document(row, True)
         print(data)
         if data == -1:
@@ -280,6 +290,7 @@ class Helper:
             'student': self.add_student_bd(self.get_student(row)),
             'document': self.add_document_bd(self.get_document(row))
         }
+        print(result_add)
         return bool(sum(result_add.values()))
 
     def del_all_bd(self, row):
@@ -335,7 +346,7 @@ if __name__ == '__main__':
     print(first_row)
 
     helper = Helper('db.db')
-    helper.create_row(1)
+    # helper.create_row(1)
 
     count = 0
     for line in rows:
