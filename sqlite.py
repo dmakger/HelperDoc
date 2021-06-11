@@ -40,13 +40,27 @@ class Sqliter:
         if table is None:
             table = self.table
 
-        is_valid = False
-
         with self.connection:
             is_valid = self.is_valid(table)
             if is_valid:
                 self.table = table
         return is_valid
+
+    def get_qualification_id(self, title):
+        """
+        Вернет id записи от таблицы qualification.
+        :return:
+        """
+
+        try:
+            with self.connection:
+                data = self.cursor.execute(
+                    f'SELECT `id` FROM {self.table_qualification} WHERE `title` = \'{title}\'').fetchall()
+                if len(data) != 0:
+                    return data[0][0]
+                return -1
+        except sqlite3.IntegrityError:
+            return -1
 
     def add_qualification(self, title: str):
         """
@@ -70,6 +84,22 @@ class Sqliter:
             self.cursor.execute(f'DELETE FROM {self.table_qualification} WHERE `id` = {pk}')
             self.save()
 
+    def get_education_program_id(self, title):
+        """
+        Вернет id записи от таблицы student.
+        :return:
+        """
+
+        try:
+            with self.connection:
+                data = self.cursor.execute(
+                    f'SELECT `id` FROM {self.table_education_program} WHERE `title` = \'{title}\'').fetchall()
+                if len(data) != 0:
+                    return data[0][0]
+                return -1
+        except sqlite3.IntegrityError:
+            return -1
+
     def add_education_program(self, title: str):
         """
         Функция add добавляет данные в таблицу education_program
@@ -89,8 +119,24 @@ class Sqliter:
 
     def del_education_program(self, pk):
         with self.connection:
-            self.cursor.execute(f'DELETE FROM {self.table_education_program} WHERE `code` = {pk}')
+            self.cursor.execute(f'DELETE FROM {self.table_education_program} WHERE `id` = {pk}')
             self.save()
+
+    def get_profession_id(self, title):
+        """
+        Вернет id записи из таблицы profession
+        :return:
+        """
+
+        try:
+            with self.connection:
+                data = self.cursor.execute(
+                    f'SELECT `code` FROM {self.table_profession} WHERE `title` = \'{title}\'').fetchall()
+                if len(data) != 0:
+                    return data[0][0]
+                return -1
+        except sqlite3.IntegrityError:
+            return -1
 
     def add_profession(self, code: str, title: str):
         """
@@ -111,12 +157,46 @@ class Sqliter:
 
     def del_profession(self, pk):
         with self.connection:
-            self.cursor.execute(f'DELETE FROM {self.table_profession} WHERE `code` = {pk}')
+            self.cursor.execute(f'DELETE FROM {self.table_profession} WHERE `code` = \'{pk}\'')
             self.save()
+
+    def get_student_id(self, name, last_name, middle_name, birth_date, gender,
+                       snills, country_code, education_form, education_receipt_form,
+                       financing_source, admission_year, graduation_year, study_period,
+                       profession_code, qualification_id, education_program_id
+                       ):
+        """
+        Вернет id студента от таблицы student
+        :return:
+        """
+
+        try:
+            with self.connection:
+
+                data = self.cursor.execute(
+                    f'SELECT `id` FROM {self.table_student} WHERE `name` = \'{name}\' AND \
+                    `last_name` = \'{last_name}\' AND `middle_name` = \'{middle_name}\' AND \
+                    `birth_date` = \'{birth_date}\' AND `gender` = \'{gender}\' AND \
+                    `snills` = \'{snills}\' AND `country_code` = \'{country_code}\' AND \
+                    `education_form` = \'{education_form}\' AND \
+                    `education_receipt_form` = \'{education_receipt_form}\' AND \
+                    `financing_source` = \'{financing_source}\' AND \
+                    `admission_year` = \'{admission_year}\' AND \
+                    `graduation_year` = \'{graduation_year}\' AND \
+                    `study_period` = \'{study_period}\' AND \
+                    `profession_code` = \'{profession_code}\' AND \
+                    `qualification_id` = \'{qualification_id}\' AND \
+                    `education_program_id` = \'{education_program_id}\'').fetchall()
+                if len(data) != 0:
+                    return data[0][0]
+                return -1
+        except sqlite3.IntegrityError:
+            return -1
 
     def add_student(self, name, last_name, middle_name, birth_date, gender,
                     snills, country_code, education_form, education_receipt_form,
-                    financing_source, profession_code, qualification_id, education_program_id
+                    financing_source, admission_year, graduation_year, study_period,
+                    profession_code, qualification_id, education_program_id
                     ):
         """
         Функция add добавляет данные в таблицу student
@@ -128,11 +208,12 @@ class Sqliter:
             with self.connection:
                 self.cursor.execute(f"INSERT INTO `{self.table_student}` (name, last_name, middle_name, birth_date, \
                 gender, snills, country_code, education_form, education_receipt_form, financing_source, \
-                profession_code, qualification_id, education_program_id) \
-                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", (name, last_name, middle_name, birth_date, gender,
-                                                          snills, country_code, education_form, education_receipt_form,
-                                                          financing_source, profession_code, qualification_id,
-                                                          education_program_id))
+                admission_year, graduation_year, study_period, profession_code, qualification_id, \
+                education_program_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                                    (name, last_name, middle_name, birth_date, gender,
+                                     snills, country_code, education_form, education_receipt_form,
+                                     financing_source, admission_year, graduation_year, study_period,
+                                     profession_code, qualification_id, education_program_id))
                 self.save()
                 is_valid = True
         except sqlite3.IntegrityError:
@@ -144,6 +225,31 @@ class Sqliter:
         with self.connection:
             self.cursor.execute(f'DELETE FROM {self.table_student} WHERE `id` = {pk}')
             self.save()
+
+    def get_document_id(self, title, type, series, number, loss_confirmation, exchange_confirmation,
+                        destruction_confirmation, education_level, issue_date, registration_number,
+                        status, student_id):
+        """
+        Вернет id студента от таблицы student
+        :return:
+        """
+
+        try:
+            with self.connection:
+                data = self.cursor.execute(
+                    f'SELECT `id` FROM {self.table_document} WHERE `title` = \'{title}\' AND \
+                    `type` = \'{type}\' AND `series` = \'{series}\' AND \
+                    `number` = \'{number}\' AND `loss_confirmation` = \'{loss_confirmation}\' AND \
+                    `exchange_confirmation` = \'{exchange_confirmation}\' AND \
+                    `destruction_confirmation` = \'{destruction_confirmation}\' AND \
+                    `education_level` = \'{education_level}\' AND  `issue_date` = \'{issue_date}\' AND \
+                    `registration_number` = \'{registration_number}\' AND `status` = \'{status}\' AND \
+                    `student_id` = \'{student_id}\'').fetchall()
+                if len(data) != 0:
+                    return data[0][0]
+                return -1
+        except sqlite3.IntegrityError:
+            return -1
 
     def add_document(self, title, type, series, number, loss_confirmation, exchange_confirmation,
                      destruction_confirmation, education_level, issue_date, registration_number,
@@ -190,191 +296,62 @@ class Sqliter:
         except sqlite3.IntegrityError:
             return -1
 
-    def get_profession_id(self, title):
+    def select(self, table: str, need: str, data: dict):
         """
-        Вернет id записи из таблицы profession
+        Вернет выбранные данные (need) из выбранной таблицы (table).
+        Выборка происходит благодаря переданным данным (data)
         :return:
         """
 
         try:
             with self.connection:
-                data = self.cursor.execute(
-                    f'SELECT `code` FROM {self.table_profession} WHERE `title` = \'{title}\'').fetchall()
-                if len(data) != 0:
-                    return data[0][0]
-                return -1
+                command = f"SELECT {need} FROM `{table}`"
+                if len(data) == 0:
+                    return self.cursor.execute(command).fetchall()
+                command += " WHERE "
+                column_values = list()
+                count = len(data)
+                for key, value in data.items():
+                    command += f"`{key}` = ?"
+                    column_values.append(value)
+                    count -= 1
+                    if count:
+                        command += " AND "
+                return self.cursor.execute(command, tuple(column_values)).fetchall()
         except sqlite3.IntegrityError:
             return -1
 
-    def get_profession_id_else_add(self, code, title):
+    def update(self, table: str, pk: dict, data: dict):
         """
-        Вернет id студента от таблицы profession.
-        Если такого profession не существовало, то добавляет и вернет id от profession
-        :return:
-        """
-
-        try:
-            profession_id = self.get_profession_id(title)
-            if profession_id == -1:
-                self.add_profession(code, title)
-                profession_id = self.get_profession_id(title)
-            return profession_id
-        except sqlite3.IntegrityError:
-            return -1
-
-    def get_qualification_id(self, title):
-        """
-        Вернет id записи от таблицы qualification.
+        Обновит выбранные данные (data) из выбранной таблицы (table).
+        Выборка происходит благодаря id таблицы (pk)
+        :param: все словари имеют следующий вид => {'имя_колоны': значение_колоны}
         :return:
         """
 
         try:
             with self.connection:
-                data = self.cursor.execute(
-                    f'SELECT `code` FROM {self.table_qualification} WHERE `title` = \'{title}\'').fetchall()
-                if len(data) != 0:
-                    return data[0][0]
-                return -1
-        except sqlite3.IntegrityError:
-            return -1
+                column_values = list()
+                command = f"UPDATE `{table}`"
 
-    def get_qualification_id_else_add(self, title):
-        """
-        Вернет id студента от таблицы qualification.
-        Если такого qualification не существовало, то добавляет и вернет id от qualification
-        :return:
-        """
-
-        try:
-            qualification_id = self.get_qualification_id(title)
-            if qualification_id == -1:
-                self.add_qualification(title)
-                qualification_id = self.get_qualification_id(title)
-            return qualification_id
-        except sqlite3.IntegrityError:
-            return -1
-
-    def get_education_program_id(self, title):
-        """
-        Вернет id записи от таблицы student.
-        :return:
-        """
-
-        try:
-            with self.connection:
-                data = self.cursor.execute(
-                    f'SELECT `code` FROM {self.table_education_program} WHERE `title` = \'{title}\'').fetchall()
-                if len(data) != 0:
-                    return data[0][0]
-                return -1
-        except sqlite3.IntegrityError:
-            return -1
-
-    def get_education_program_id_else_add(self, title):
-        """
-        Вернет id студента от таблицы education_program.
-        Если такого education_program не существовало, то добавляет и вернет id от education_program
-        :return:
-        """
-
-        try:
-            education_program_id = self.get_education_program_id(title)
-            if education_program_id == -1:
-                self.add_education_program(title)
-                education_program_id = self.get_education_program_id(title)
-            return education_program_id
-        except sqlite3.IntegrityError:
-            return -1
-
-    def get_student_id(self, name, last_name, middle_name, birth_date, snills):
-        """
-        Вернет id студента от таблицы student
-        :return:
-        """
-
-        try:
-            with self.connection:
-                data = self.cursor.execute(
-                    f'SELECT `code` FROM {self.table_student} WHERE `name` = \'{name}\' AND \
-                    `last_name` = \'{last_name}\' AND `middle_name` = \'{middle_name}\' AND \
-                    `birth_date` = \'{birth_date}\' AND `snills` = \'{snills}\'').fetchall()
-                if len(data) != 0:
-                    return data[0][0]
-                return -1
-        except sqlite3.IntegrityError:
-            return -1
-
-    def get_student_id_else_add(self, name, last_name, middle_name, birth_date, gender,
-                                snills, country_code, education_form, education_receipt_form,
-                                financing_source, profession_code, qualification_id, education_program_id):
-        """
-        Вернет id студента от таблицы student.
-        Если такого студента не существовало, то добавляет и вернет id student
-        :return:
-        """
-
-        try:
-            data = [name, last_name, middle_name, birth_date, gender,
-                    snills, country_code, education_form, education_receipt_form,
-                    financing_source, profession_code, qualification_id, education_program_id]
-            student_id = self.get_student_id(*data)
-            if student_id == -1:
-                self.add_student(*data)
-                student_id = self.get_student_id(*data)
-            return student_id
-        except sqlite3.IntegrityError:
-            return -1
-
-    def get_document_id(self, title, type, series, number, loss_confirmation, exchange_confirmation,
-                       destruction_confirmation, education_level, issue_date, registration_number,
-                       status, student_id):
-        """
-        Вернет id студента от таблицы student
-        :return:
-        """
-
-        try:
-            with self.connection:
-                data = self.cursor.execute(
-                    f'SELECT `code` FROM {self.table_student} WHERE \
-                    `title` = \'{title}\' AND `type` = \'{type}\' AND `series` = \'{series}\' AND \
-                    `number` = \'{number}\' AND `loss_confirmation` = \'{loss_confirmation}\' AND \
-                    `exchange_confirmation` = \'{exchange_confirmation}\' AND \
-                    `destruction_confirmation` = \'{destruction_confirmation}\' AND \
-                    `education_level` = \'{education_level}\' AND  `issue_date` = \'{issue_date}\' AND \
-                    `registration_number` = \'{registration_number}\' AND `status` = \'{status}\' AND \
-                    `student_id` = \'{student_id}\'').fetchall()
-                if len(data) != 0:
-                    return data[0][0]
-                return -1
-        except sqlite3.IntegrityError:
-            return -1
-
-    def get_document_id_else_add(self, name, last_name, middle_name, birth_date, gender,
-                                snills, country_code, education_form, education_receipt_form,
-                                financing_source, profession_code, qualification_id, education_program_id):
-        """
-        Вернет id студента от таблицы student.
-        Если такого студента не существовало, то добавляет и вернет id student
-        :return:
-        """
-
-        try:
-            data = [name, last_name, middle_name, birth_date, gender,
-                    snills, country_code, education_form, education_receipt_form,
-                    financing_source, profession_code, qualification_id, education_program_id]
-            document_id = self.get_document_id(*data)
-            if document_id == -1:
-                self.add_document(*data)
-                document_id = self.get_document_id(*data)
-            return document_id
+                key_pk = list(pk.keys())[0]
+                command += f" SET `{key_pk}` WHERE "
+                column_values.append(pk[key_pk])
+                count = len(data)
+                for key, value in data.items():
+                    column_values.append(value)
+                    command += f"`{key}` = ?"
+                    count -= 1
+                    if count:
+                        command += ", "
+                return self.cursor.execute(command, tuple(column_values)).fetchall()
         except sqlite3.IntegrityError:
             return -1
 
     # Функция save сохраняет изменения в БД
     def save(self):
         self.connection.commit()
-        print(f"{self.cursor.rowcount} отредактированно строк")
+        # print(f"{self.cursor.rowcount} отредактированно строк")
 
     # Функция close закрывает БД
     def close(self):
