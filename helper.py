@@ -23,6 +23,9 @@ class Helper:
         }
 
     def add_profession_bd(self, row):
+        if row[0] == '' or row[1] == '':
+            return False
+
         data = dict()
         if (type(row) is list) or (type(row) is tuple):
             data = self.get_profession(row)
@@ -58,6 +61,9 @@ class Helper:
         }
 
     def add_qualification_bd(self, row):
+        if row[0] == '':
+            return False
+
         data = dict()
         if (type(row) is list) or (type(row) is tuple):
             data = self.get_qualification(row)
@@ -96,6 +102,9 @@ class Helper:
         }
 
     def add_education_program_bd(self, row):
+        if row[0] == '':
+            return False
+
         data = dict()
         if (type(row) is list) or (type(row) is tuple):
             data = self.get_education_program(row)
@@ -125,12 +134,8 @@ class Helper:
         return is_del_success
 
     def get_student(self, row, is_form_list=False):
-        print("row[13]: ", row[13])
         qualification_id = self.bd.get_qualification_id(row[13])
-        print("qualification_id: ", qualification_id)
         education_program_id = self.bd.get_education_program_id(row[14])
-        print("education_program_id: ", education_program_id)
-
         if (qualification_id == -1) or (education_program_id == -1):
             return -1
 
@@ -208,11 +213,9 @@ class Helper:
 
     def get_document(self, row, is_form_list=False):
         student = self.get_student(row, True)
-        print("student: ", student)
         if student == -1:
             return -1
         student_id = self.bd.get_student_id(*student)
-        # print("student_id: ", student_id)
         if student_id == -1:
             return -1
 
@@ -273,9 +276,7 @@ class Helper:
         return is_added
 
     def del_document_bd(self, row):
-        print("qwe")
         data = self.get_document(row, True)
-        print(data)
         if data == -1:
             return False
         pk = self.bd.get_document_id(*data)
@@ -290,7 +291,6 @@ class Helper:
             'student': self.add_student_bd(self.get_student(row)),
             'document': self.add_document_bd(self.get_document(row))
         }
-        print(result_add)
         return bool(sum(result_add.values()))
 
     def del_all_bd(self, row):
@@ -301,7 +301,6 @@ class Helper:
             'qualification': self.del_qualification_bd(row),
             'profession': self.del_profession_bd(row),
         }
-        print(result_del)
         return result_del['document']
 
     def create_row(self, pk_document):
@@ -323,7 +322,7 @@ class Helper:
                 student[6], student[7], student[8],
                 student[9], student[10]
             )
-            print(data)
+            # print(data)
             return data
         except Exception:
             return -1
