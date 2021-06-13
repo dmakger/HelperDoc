@@ -172,21 +172,26 @@ class Sqliter:
 
         try:
             with self.connection:
-
-                data = self.cursor.execute(
-                    f'SELECT `id` FROM {self.table_student} WHERE `name` = \'{name}\' AND \
-                    `last_name` = \'{last_name}\' AND `middle_name` = \'{middle_name}\' AND \
-                    `birth_date` = \'{birth_date}\' AND `gender` = \'{gender}\' AND \
-                    `snills` = \'{snills}\' AND `country_code` = \'{country_code}\' AND \
-                    `education_form` = \'{education_form}\' AND \
-                    `education_receipt_form` = \'{education_receipt_form}\' AND \
-                    `financing_source` = \'{financing_source}\' AND \
-                    `admission_year` = \'{admission_year}\' AND \
-                    `graduation_year` = \'{graduation_year}\' AND \
-                    `study_period` = \'{study_period}\' AND \
-                    `profession_code` = \'{profession_code}\' AND \
-                    `qualification_id` = \'{qualification_id}\' AND \
-                    `education_program_id` = \'{education_program_id}\'').fetchall()
+                command = f'SELECT `id` FROM {self.table_student} WHERE `name` = ? AND \
+                    `last_name` = ? AND `middle_name` = ? AND \
+                    `birth_date` = ? AND `gender` = ? AND \
+                    `snills` = ? AND `country_code` = ? AND \
+                    `education_form` = ? AND \
+                    `education_receipt_form` = ? AND \
+                    `financing_source` = ? AND \
+                    `admission_year` = ? AND \
+                    `graduation_year` = ? AND \
+                    `study_period` = ? AND \
+                    `profession_code` = ? AND \
+                    `qualification_id` = ? AND \
+                    `education_program_id` = ?'
+                args = (
+                    name, last_name, middle_name, birth_date, gender,
+                    snills, country_code, education_form, education_receipt_form,
+                    financing_source, admission_year, graduation_year, study_period,
+                    profession_code, qualification_id, education_program_id
+                )
+                data = self.cursor.execute(command, args).fetchall()
                 if len(data) != 0:
                     return data[0][0]
                 return -1

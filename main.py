@@ -78,6 +78,7 @@ class HelperDoc(QtWidgets.QMainWindow):
         self.ui.registration_number_line.clear()
         self.ui.code_profession_line.clear()
         self.ui.title_profession_line.clear()
+        self.ui.title_qualification_line.clear()
         self.ui.education_program_line.clear()
         self.ui.admission_year_line.clear()
         self.ui.graduation_year_line.clear()
@@ -108,6 +109,7 @@ class HelperDoc(QtWidgets.QMainWindow):
         data.append(self.ui.registration_number_line.text())
         data.append(self.ui.code_profession_line.text())
         data.append(self.ui.title_profession_line.text())
+        data.append(self.ui.title_qualification_line.text())
         data.append(self.ui.education_program_line.text())
         data.append(self.ui.admission_year_line.text())
         data.append(self.ui.graduation_year_line.text())
@@ -122,41 +124,61 @@ class HelperDoc(QtWidgets.QMainWindow):
         data.append(self.ui.education_form_line.text())
         data.append(self.ui.education_receipt_form_line.text())
         data.append(self.ui.financing_source_line.text())
+
+        # data = [
+        #     'Диплом', 'Диплом о среднем профессиональном образовании', 'Оригинал',
+        #     'Нет', 'Нет', 'Нет', 'Среднее профессиональное образование', '115033', '0101709',
+        #     '02.07.2020', '298', '10.02.01', 'Организация и технология защиты информации',
+        #     'техник по защите информации', 'техник по защите информации', '2016', '2020', '4',
+        #     'Азаров', 'Тимофей', 'Максимович', '30.05.2000', 'Муж', '192-465-544', '95', '643',
+        #     'Очная	в образовательной организации', 'Региональный бюджет'
+        # ]
         return data
 
     def add_row(self):
-        new_row_position = self.ui.table.currentRow() + 1
-        self.ui.table.insertRow(new_row_position)
-        inputted_data = self.get_inputted_data()
-        print(inputted_data)
-        for i in range(len(inputted_data)):
-            self.ui.table.setItem(new_row_position, i, QtWidgets.QTableWidgetItem(inputted_data[i]))
-        try:
-            print(len(inputted_data))
-            self.helper.add_all_bd(inputted_data)
+        if self.mbox_execute("Вы уверены, что хотите добавить данные?"):
+            new_row_position = self.ui.table.currentRow() + 1
+            inputted_data = self.get_inputted_data()
             for i in range(len(inputted_data)):
                 self.ui.table.setItem(new_row_position, i, QtWidgets.QTableWidgetItem(inputted_data[i]))
-        except Exception:
-            self.mbox("Некоректный ввод данных")
+            try:
+                self.helper.add_all_bd(inputted_data)
+                for i in range(len(inputted_data)):
+                    self.ui.table.setItem(new_row_position, i, QtWidgets.QTableWidgetItem(inputted_data[i]))
+                self.ui.table.insertRow(new_row_position)
+            except Exception:
+                self.mbox("Некоректный ввод данных")
 
     def remove_row(self):
-        if self.ui.table.rowCount() > 0:
-            current_row_position = self.ui.table.currentRow()
-            print(current_row_position)
-            row = self.get_row_by_position(current_row_position)
+        if self.mbox_execute("Вы уверены, что хотите удалить данные?"):
+            if self.ui.table.rowCount() > 0:
+                current_row_position = self.ui.table.currentRow()
+                print(current_row_position)
+                row = self.get_row_by_position(current_row_position)
 
-            result = list()
-            result.append(self.helper.del_all_bd(row))
-            print(result)
-            self.ui.table.removeRow(current_row_position)
-        else:
-            self.mbox("Невозможно удалить, так как таблица пуста")
+                result = list()
+                result.append(self.helper.del_all_bd(row))
+                print(result)
+                self.ui.table.removeRow(current_row_position)
+            else:
+                self.mbox("Невозможно удалить, так как таблица пуста")
+
+    def mbox_execute(self, body, title='Предупреждение'):
+        dialog = QMessageBox()
+        dialog.setText(body)
+        dialog.setWindowTitle(title)
+        dialog.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+
+        result = dialog.exec()
+        if result == QMessageBox.StandardButton.Yes:
+            return True
+        elif result == QMessageBox.StandardButton.No:
+            return False
 
     def mbox(self, body, title='Ошибка'):
         dialog = QMessageBox()
         dialog.setText(body)
         dialog.setWindowTitle(title)
-        dialog.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
         dialog.exec()
 
 

@@ -23,7 +23,7 @@ class Helper:
         }
 
     def add_profession_bd(self, row):
-        if row[0] == '' or row[1] == '':
+        if row == -1:
             return False
 
         data = dict()
@@ -61,7 +61,7 @@ class Helper:
         }
 
     def add_qualification_bd(self, row):
-        if row[0] == '':
+        if row == -1:
             return False
 
         data = dict()
@@ -102,7 +102,7 @@ class Helper:
         }
 
     def add_education_program_bd(self, row):
-        if row[0] == '':
+        if row == -1:
             return False
 
         data = dict()
@@ -170,6 +170,9 @@ class Helper:
         }
 
     def add_student_bd(self, row):
+        if row == -1:
+            return False
+
         data = dict()
         if (type(row) is list) or (type(row) is tuple):
             data = self.get_student(row)
@@ -213,6 +216,7 @@ class Helper:
 
     def get_document(self, row, is_form_list=False):
         student = self.get_student(row, True)
+        print(student)
         if student == -1:
             return -1
         student_id = self.bd.get_student_id(*student)
@@ -247,11 +251,17 @@ class Helper:
         }
 
     def add_document_bd(self, row):
+        if row == -1:
+            return False
+
         data = dict()
         if (type(row) is list) or (type(row) is tuple):
             data = self.get_document(row)
         if type(row) is dict:
             data = row
+        print(data)
+        print(data['title'])
+        print(data['registration_number'])
 
         is_added = False
         data_of_list = [
@@ -270,6 +280,7 @@ class Helper:
         ]
 
         data_id = self.bd.get_document_id(*data_of_list)
+        print(data_id)
         if data_id == -1:
             is_added = True
             self.bd.add_document(*data_of_list)
@@ -291,6 +302,7 @@ class Helper:
             'student': self.add_student_bd(self.get_student(row)),
             'document': self.add_document_bd(self.get_document(row))
         }
+        print(result_add)
         return bool(sum(result_add.values()))
 
     def del_all_bd(self, row):
@@ -334,27 +346,28 @@ class Helper:
 if __name__ == '__main__':
     doc = Excel("ККМТ2020 Очно.xlsx")
     doc.max_col = 28
-    doc.max_row = 11
+    # doc.max_row = 11
 
-    rows = doc.get_rows(False)
+    # rows = doc.get_rows(False)
 
-    first_row = rows[0]
-    title = doc.get_title_row()
-    for i in range(len(title)):
-        print(f"{i}| {title[i]}: {first_row[i]}")
-    print(first_row)
+    # first_row = rows[0]
+    # title = doc.get_title_row()
+    # for i in range(len(title)):
+    #     print(f"{i}| {title[i]}: {first_row[i]}")
+    # print(first_row)
 
     helper = Helper('db.db')
     # helper.create_row(1)
 
     count = 0
-    for line in rows:
-        # is_add = helper.add_all_bd(line)
-        # print(is_add)
-        count += 1
-        print(count)
-        # is_del = helper.del_all_bd(line)
-        # print(is_del)
+    # for i in range(145, 362):
+    # for i in range(2, 145):
+    #     line = doc.get_row(i)
+    #     # is_add = helper.add_all_bd(line)
+    #     # print(f"{i}| {is_add}")
+    #     count += 1
+    #     is_del = helper.del_all_bd(line)
+    #     print(f"{i}| {is_del}")
 
     # data = helper.bd.select(helper.table_document, '*', {})
     # for line in data:
