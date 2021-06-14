@@ -1,7 +1,9 @@
 import sys
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtWidgets
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMessageBox
+from docxtpl import DocxTemplate
+# import subprocess
 
 from design import Ui_HelperDoc
 from excel import Excel
@@ -14,6 +16,7 @@ class HelperDoc(QtWidgets.QMainWindow):
         super().__init__()
         self.excel = Excel("ККМТ2020 Очно.xlsx")
         self.helper = Helper('db.db')
+        self.word = DocxTemplate("template.docx")
         self.excel.max_col = 28
         self.excel.max_row = 11
 
@@ -31,6 +34,7 @@ class HelperDoc(QtWidgets.QMainWindow):
         self.ui.add_row.clicked.connect(lambda: self.add_row())
         self.ui.table.setEditTriggers(QtWidgets.QTableWidget.EditTrigger.NoEditTriggers)
         self.ui.remove_row.clicked.connect(lambda: self.remove_row())
+        self.ui.create_doc.clicked.connect(lambda: self.create_doc())
 
     def load_data(self):
         # [(1,), (2,), (3,)]
@@ -46,10 +50,42 @@ class HelperDoc(QtWidgets.QMainWindow):
                 self.ui.table.setItem(table_row, i, QtWidgets.QTableWidgetItem(str(data[i])))
             table_row += 1
 
-    def get_row_by_position(self, position):
+    def get_row_by_position(self, position, type_dict=False):
         row = list()
-        for col in range(self.ui.table.columnCount()):
-            row.append(self.ui.table.item(position, col).text())
+        if not type_dict:
+            for col in range(self.ui.table.columnCount()):
+                row.append(self.ui.table.item(position, col).text())
+        else:
+            row = {
+                'title_doc': self.ui.table.item(position, 0).text(),
+                'type_doc': self.ui.table.item(position, 1).text(),
+                'status_doc': self.ui.table.item(position, 2).text(),
+                'loss_confirmation': self.ui.table.item(position, 3).text(),
+                'confirmation_exchange': self.ui.table.item(position, 4).text(),
+                'destruction_confirmation': self.ui.table.item(position, 5).text(),
+                'education_level': self.ui.table.item(position, 6).text(),
+                'series_doc': self.ui.table.item(position, 7).text(),
+                'number_doc': self.ui.table.item(position, 8).text(),
+                'issue_date': self.ui.table.item(position, 9).text(),
+                'registration_number': self.ui.table.item(position, 10).text(),
+                'code_profession': self.ui.table.item(position, 11).text(),
+                'title_profession': self.ui.table.item(position, 12).text(),
+                'title_qualification': self.ui.table.item(position, 13).text(),
+                'education_program': self.ui.table.item(position, 14).text(),
+                'admission_year': self.ui.table.item(position, 15).text(),
+                'graduation_year': self.ui.table.item(position, 16).text(),
+                'study_period': self.ui.table.item(position, 17).text(),
+                'last_name': self.ui.table.item(position, 18).text(),
+                'name': self.ui.table.item(position, 19).text(),
+                'middle_name': self.ui.table.item(position, 20).text(),
+                'birth_date': self.ui.table.item(position, 21).text(),
+                'gender': self.ui.table.item(position, 22).text(),
+                'snills': self.ui.table.item(position, 23).text(),
+                'country_code': self.ui.table.item(position, 24).text(),
+                'education_form': self.ui.table.item(position, 25).text(),
+                'education_receipt_form': self.ui.table.item(position, 26).text(),
+                'financing_source': self.ui.table.item(position, 27).text(),
+            }
         return row
 
     def add_row_excel(self):
@@ -162,6 +198,33 @@ class HelperDoc(QtWidgets.QMainWindow):
                 self.ui.table.removeRow(current_row_position)
             else:
                 self.mbox("Невозможно удалить, так как таблица пуста")
+
+    def create_doc(self):
+        current_row_position = self.ui.table.currentRow()
+        print(current_row_position)
+        row = self.get_row_by_position(current_row_position, True)
+        context = {
+            'last_name': row['last_name'],
+            'name': row['name'],
+            'middle_name': row['middle_name'],
+            'birth_date': row['birth_date'],
+            'admission_year': row['admission_year'],
+            'graduation_year': row['graduation_year'],
+            'education_form': row['education_form'].lower()[:-2] + "ое",
+            'title_doc': row['title_doc'].lower(),
+            'registration_number': row['registration_number'],
+            'title_profession': row['title_profession'].lower(),
+            'title_qualification': row['title_qualification'].lower(),
+        }
+        print(context)
+        self.word.render(context)
+        name_f = context['last_name'] + '_' + context['name'] + '_' + context['middle_name'] + ".docx"
+        try:
+            self.word.save(f"./Документы/{name_f}")
+            # print(subprocess.Popen(r'explorer /select,"./Документы"'))
+            # self.mbox(f"Файл \"{name_f}\" успешно создан!", "Успех")
+        except Exception:
+            self.mbox(f"Файл с именем \"{name_f}\" открыт. Закройте его и перевыполните действие")
 
     def mbox_execute(self, body, title='Предупреждение'):
         dialog = QMessageBox()

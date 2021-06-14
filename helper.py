@@ -359,13 +359,12 @@ if __name__ == '__main__':
     helper = Helper('db.db')
     # helper.create_row(1)
 
-    count = 0
     # for i in range(145, 362):
     # for i in range(2, 145):
+    # for i in range(2, 11):
     #     line = doc.get_row(i)
-    #     # is_add = helper.add_all_bd(line)
-    #     # print(f"{i}| {is_add}")
-    #     count += 1
+    #     is_add = helper.add_all_bd(line)
+    #     print(f"{i}| {is_add}")
     #     is_del = helper.del_all_bd(line)
     #     print(f"{i}| {is_del}")
 
