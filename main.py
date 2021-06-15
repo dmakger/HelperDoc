@@ -32,16 +32,19 @@ class HelperDoc(QtWidgets.QMainWindow):
         self.load_data()
         self.ui.clear.clicked.connect(lambda: self.clear_data())
         self.ui.add_row.clicked.connect(lambda: self.add_row())
+        self.ui.suggest_input_button.clicked.connect(lambda: self.find_rows())
         self.ui.table.setEditTriggers(QtWidgets.QTableWidget.EditTrigger.NoEditTriggers)
         self.ui.remove_row.clicked.connect(lambda: self.remove_row())
         self.ui.create_doc.clicked.connect(lambda: self.create_doc())
 
-    def load_data(self):
+    def get_all_id(self):
         # [(1,), (2,), (3,)]
         all_id = self.helper.bd.select(self.helper.table_document, 'id', {})
         # [1, 2, 3]
-        all_id = [pk[0] for pk in all_id]
+        return [pk[0] for pk in all_id]
 
+    def load_data(self):
+        all_id = self.get_all_id()
         table_row = 0
         self.ui.table.setRowCount(len(all_id))
         for pk in all_id:
@@ -173,17 +176,41 @@ class HelperDoc(QtWidgets.QMainWindow):
 
     def add_row(self):
         if self.mbox_execute("Вы уверены, что хотите добавить данные?"):
-            new_row_position = self.ui.table.currentRow() + 1
+            # new_row_position = self.ui.table.currentRow() + 1
+            new_row_position = self.ui.table.rowCount()
             inputted_data = self.get_inputted_data()
             for i in range(len(inputted_data)):
-                self.ui.table.setItem(new_row_position, i, QtWidgets.QTableWidgetItem(inputted_data[i]))
+                self.ui.table.setItem(new_row_position, i, QtWidgets.QTableWidgetItem(inputted_data[i].strip()))
             try:
-                self.helper.add_all_bd(inputted_data)
-                for i in range(len(inputted_data)):
-                    self.ui.table.setItem(new_row_position, i, QtWidgets.QTableWidgetItem(inputted_data[i]))
-                self.ui.table.insertRow(new_row_position)
+                result = self.helper.add_all_bd(inputted_data)
+                if result:
+                    self.ui.table.insertRow(new_row_position)
+                    for i in range(len(inputted_data)):
+                        self.ui.table.setItem(new_row_position, i, QtWidgets.QTableWidgetItem(inputted_data[i].strip()))
             except Exception:
                 self.mbox("Некоректный ввод данных")
+
+    def includes_row(self, row, wanted):
+        for col in row:
+            if wanted in str(col):
+                return True
+        return False
+
+    def find_rows(self):
+        text = self.ui.suggest_input.text().strip()
+        if text == '':
+            self.load_data()
+        else:
+            need_rows = list()
+            for pk in self.get_all_id():
+                row = self.helper.create_row(pk)
+                if self.includes_row(row, text):
+                    need_rows.append(row)
+            len_need_rows = len(need_rows)
+            self.ui.table.setRowCount(len_need_rows)
+            for i in range(len_need_rows):
+                for j in range(self.ui.table.columnCount()):
+                    self.ui.table.setItem(i, j, QtWidgets.QTableWidgetItem(need_rows[i][j]))
 
     def remove_row(self):
         if self.mbox_execute("Вы уверены, что хотите удалить данные?"):

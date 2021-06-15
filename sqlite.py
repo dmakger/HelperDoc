@@ -289,6 +289,34 @@ class Sqliter:
             self.cursor.execute(f'DELETE FROM {self.table_document} WHERE `id` = {pk}')
             self.save()
 
+    def get_id(self, table: str, name_pk: str, data: dict):
+        """
+        Вернет id студента от таблицы student
+        :return:
+        """
+
+        try:
+            with self.connection:
+                command = f"SELECT `{name_pk}` FROM `{table}`"
+                count = len(data)
+                if count == 0:
+                    return -1
+                command += " WHERE "
+                column_values = list()
+                for key, value in data.items():
+                    count -= 1
+                    if value is not None:
+                        command += f"`{key}` = ?"
+                        column_values.append(value)
+                        if count:
+                            command += " AND "
+                need_id = self.cursor.execute(command, tuple(column_values)).fetchall()
+                if len(need_id) != 0:
+                    return need_id[0][0]
+                return -1
+        except sqlite3.IntegrityError:
+            return -1
+
     def get_last_id(self, table, name_pk):
         """
         Вернет последнее id записи из таблицы которую вы передадите
@@ -325,6 +353,8 @@ class Sqliter:
                 return self.cursor.execute(command, tuple(column_values)).fetchall()
         except sqlite3.IntegrityError:
             return -1
+
+    # def get
 
     def update(self, table: str, pk: dict, data: dict):
         """

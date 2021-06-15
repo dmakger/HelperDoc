@@ -33,8 +33,9 @@ class Helper:
             data = row
 
         is_added = False
-        data_id = self.bd.get_profession_id(data['title'])
-        if data_id == -1:
+        # pk = self.bd.get_profession_id(data['title'])
+        pk = self.bd.get_id(self.table_profession, 'code', {'title': data['title']})
+        if pk == -1:
             is_added = True
             self.bd.add_profession(data['code'], data['title'])
         return is_added
@@ -45,7 +46,8 @@ class Helper:
         data = self.get_profession(row)
         if data == -1:
             return is_del_success
-        pk = self.bd.get_profession_id(data['title'])
+        # pk = self.bd.get_profession_id(data['title'])
+        pk = self.bd.get_id(self.table_profession, 'code', {'title': data['title']})
         num_id = len(self.bd.select(self.table_student, '`id`', {'profession_code': pk}))
         if num_id == 0:
             self.bd.del_profession(pk)
@@ -71,8 +73,9 @@ class Helper:
             data = row
 
         is_added = False
-        data_id = self.bd.get_qualification_id(data['title'])
-        if data_id == -1:
+        # data_id = self.bd.get_qualification_id(data['title'])
+        pk = self.bd.get_id(self.table_qualification, 'id', data)
+        if pk == -1:
             is_added = True
             self.bd.add_qualification(data['title'])
         return is_added
@@ -80,10 +83,11 @@ class Helper:
     def del_qualification_bd(self, row):
         is_del_success = False
 
-        data = self.get_qualification(row, True)
+        data = self.get_qualification(row)
         if data == -1:
             return is_del_success
-        pk = self.bd.get_qualification_id(*data)
+        # pk = self.bd.get_qualification_id(*data)
+        pk = self.bd.get_id(self.table_qualification, 'id', data)
         # кол-во используемых id
         num_id = len(self.bd.select(self.table_student, '`id`', {'qualification_id': pk}))
         if num_id == 0:
@@ -112,8 +116,9 @@ class Helper:
             data = row
 
         is_added = False
-        data_id = self.bd.get_education_program_id(data['title'])
-        if data_id == -1:
+        # data_id = self.bd.get_education_program_id(data['title'])
+        pk = self.bd.get_id(self.table_education_program, 'id', data)
+        if pk == -1:
             is_added = True
             self.bd.add_education_program(data['title'])
         return is_added
@@ -121,11 +126,12 @@ class Helper:
     def del_education_program_bd(self, row):
         is_del_success = False
 
-        data = self.get_education_program(row, True)
+        data = self.get_education_program(row)
         if data == -1:
             return is_del_success
 
-        pk = self.bd.get_education_program_id(*data)
+        # pk = self.bd.get_education_program_id(*data)
+        pk = self.bd.get_id(self.table_education_program, 'id', data)
         # кол-во используемых id
         num_id = len(self.bd.select(self.table_student, '`id`', {'education_program_id': pk}))
         if num_id == 0:
@@ -134,8 +140,10 @@ class Helper:
         return is_del_success
 
     def get_student(self, row, is_form_list=False):
-        qualification_id = self.bd.get_qualification_id(row[13])
-        education_program_id = self.bd.get_education_program_id(row[14])
+        # qualification_id = self.bd.get_qualification_id(row[13])
+        qualification_id = self.bd.get_id(self.table_qualification, 'id', {'title': row[13]})
+        # education_program_id = self.bd.get_education_program_id(row[14])
+        education_program_id = self.bd.get_id(self.table_education_program, 'id', {'title': row[14]})
         if (qualification_id == -1) or (education_program_id == -1):
             return -1
 
@@ -200,26 +208,28 @@ class Helper:
             data['education_program_id'],
         ]
 
-        data_id = self.bd.get_student_id(*data_of_list)
-        if data_id == -1:
+        # data_id = self.bd.get_student_id(*data_of_list)
+        pk = self.bd.get_id(self.table_student, 'id', data)
+        if pk == -1:
             is_added = True
             self.bd.add_student(*data_of_list)
         return is_added
 
     def del_student_bd(self, row):
-        data = self.get_student(row, True)
+        data = self.get_student(row)
         if data == -1:
             return False
-        pk = self.bd.get_student_id(*data)
+        # pk = self.bd.get_student_id(*data)
+        pk = self.bd.get_id(self.table_student, 'id', data)
         self.bd.del_student(pk)
         return True
 
     def get_document(self, row, is_form_list=False):
-        student = self.get_student(row, True)
-        print(student)
+        student = self.get_student(row)
         if student == -1:
             return -1
-        student_id = self.bd.get_student_id(*student)
+        # student_id = self.bd.get_student_id(*student)
+        student_id = self.bd.get_id(self.table_student, 'id', student)
         if student_id == -1:
             return -1
 
@@ -259,9 +269,6 @@ class Helper:
             data = self.get_document(row)
         if type(row) is dict:
             data = row
-        print(data)
-        print(data['title'])
-        print(data['registration_number'])
 
         is_added = False
         data_of_list = [
@@ -279,18 +286,20 @@ class Helper:
             data['student_id']
         ]
 
-        data_id = self.bd.get_document_id(*data_of_list)
-        print(data_id)
-        if data_id == -1:
+        # data_id = self.bd.get_document_id(*data_of_list)
+        pk = self.bd.get_id(self.table_document, 'id', data)
+        if pk == -1:
             is_added = True
             self.bd.add_document(*data_of_list)
         return is_added
 
     def del_document_bd(self, row):
-        data = self.get_document(row, True)
+        data = self.get_document(row)
         if data == -1:
             return False
-        pk = self.bd.get_document_id(*data)
+        # pk = self.bd.get_document_id(*data)
+        pk = self.bd.get_id(self.table_document, 'id', data)
+
         self.bd.del_document(pk)
         return True
 
@@ -302,7 +311,7 @@ class Helper:
             'student': self.add_student_bd(self.get_student(row)),
             'document': self.add_document_bd(self.get_document(row))
         }
-        print(result_add)
+        # print(result_add)
         return bool(sum(result_add.values()))
 
     def del_all_bd(self, row):
@@ -358,18 +367,23 @@ if __name__ == '__main__':
 
     helper = Helper('db.db')
     # helper.create_row(1)
-
-    # for i in range(145, 362):
-    # for i in range(2, 145):
-    # for i in range(2, 11):
+    # line = doc.get_row(2)
+    # is_add = helper.del_all_bd(line)
+    # print(is_add)
+    # list_false = list()
+    # for i in range(2, 362):
     #     line = doc.get_row(i)
     #     is_add = helper.add_all_bd(line)
-    #     print(f"{i}| {is_add}")
-    #     is_del = helper.del_all_bd(line)
-    #     print(f"{i}| {is_del}")
+    #     if not is_add:
+    #         list_false.append(i)
+    #     else:
+    #         print(f"{i}| {is_add}")
+        # is_del = helper.del_all_bd(line)
+        # print(f"{i}| {is_del}")
 
     # data = helper.bd.select(helper.table_document, '*', {})
     # for line in data:
     #     print(line)
 
+    # print(dict_false)
     helper.close()
