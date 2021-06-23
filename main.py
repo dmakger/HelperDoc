@@ -13,8 +13,12 @@ from helper import Helper
 class HelperDoc(QtWidgets.QMainWindow):
 
     def __init__(self):
+        """
+        Главный класс. Объединяет GUI и функциональную часть
+        """
         super().__init__()
-        self.excel = Excel("ККМТ2020 Очно.xlsx")
+
+        self.excel = Excel("KKMT2020.xlsx")
         self.helper = Helper('db.db')
         self.word = DocxTemplate("template.docx")
         self.excel.max_col = 28
@@ -25,6 +29,10 @@ class HelperDoc(QtWidgets.QMainWindow):
         self.init_UI()
 
     def init_UI(self):
+        """
+        Добавляет функционал всем кнопкам
+        :return:
+        """
         self.setWindowTitle('HelperDoc')
         self.setWindowIcon(QIcon('favicon.ico'))
 
@@ -38,12 +46,18 @@ class HelperDoc(QtWidgets.QMainWindow):
         self.ui.create_doc.clicked.connect(lambda: self.create_doc())
 
     def get_all_id(self):
+        """
+        :return: список всех id из таблицы 'table_document'
+        """
         # [(1,), (2,), (3,)]
         all_id = self.helper.bd.select(self.helper.table_document, 'id', {})
         # [1, 2, 3]
         return [pk[0] for pk in all_id]
 
     def load_data(self):
+        """
+        Загружает все данные из бд в GUI
+        """
         all_id = self.get_all_id()
         table_row = 0
         self.ui.table.setRowCount(len(all_id))
@@ -54,8 +68,14 @@ class HelperDoc(QtWidgets.QMainWindow):
             table_row += 1
 
     def get_row_by_position(self, position, type_dict=False):
-        row = list()
+        """
+
+        :param position: позиция нужной строки в бд
+        :param type_dict: тип возвращаемых данных (true - dict; false - list)
+        :return: Строка типа dict или list
+        """
         if not type_dict:
+            row = list()
             for col in range(self.ui.table.columnCount()):
                 row.append(self.ui.table.item(position, col).text())
         else:
@@ -92,6 +112,10 @@ class HelperDoc(QtWidgets.QMainWindow):
         return row
 
     def add_row_excel(self):
+        """
+        Lj
+        :return:
+        """
         current_row_position = self.ui.table.currentRow()
         # current_row_position = 0
         # # row = self.get_row_by_position(current_row_position)
@@ -228,30 +252,30 @@ class HelperDoc(QtWidgets.QMainWindow):
 
     def create_doc(self):
         current_row_position = self.ui.table.currentRow()
-        print(current_row_position)
-        row = self.get_row_by_position(current_row_position, True)
-        context = {
-            'last_name': row['last_name'],
-            'name': row['name'],
-            'middle_name': row['middle_name'],
-            'birth_date': row['birth_date'],
-            'admission_year': row['admission_year'],
-            'graduation_year': row['graduation_year'],
-            'education_form': row['education_form'].lower()[:-2] + "ое",
-            'title_doc': row['title_doc'].lower(),
-            'registration_number': row['registration_number'],
-            'title_profession': row['title_profession'].lower(),
-            'title_qualification': row['title_qualification'].lower(),
-        }
-        print(context)
-        self.word.render(context)
-        name_f = context['last_name'] + '_' + context['name'] + '_' + context['middle_name'] + ".docx"
-        try:
-            self.word.save(f"./Документы/{name_f}")
-            # print(subprocess.Popen(r'explorer /select,"./Документы"'))
-            # self.mbox(f"Файл \"{name_f}\" успешно создан!", "Успех")
-        except Exception:
-            self.mbox(f"Файл с именем \"{name_f}\" открыт. Закройте его и перевыполните действие")
+        if current_row_position != -1:
+            row = self.get_row_by_position(current_row_position, True)
+            context = {
+                'last_name': row['last_name'],
+                'name': row['name'],
+                'middle_name': row['middle_name'],
+                'birth_date': row['birth_date'],
+                'admission_year': row['admission_year'],
+                'graduation_year': row['graduation_year'],
+                'education_form': row['education_form'].lower()[:-2] + "ое",
+                'title_doc': row['title_doc'].lower(),
+                'registration_number': row['registration_number'],
+                'title_profession': row['title_profession'].lower(),
+                'title_qualification': row['title_qualification'].lower(),
+            }
+            print(context)
+            self.word.render(context)
+            name_f = context['last_name'] + '_' + context['name'] + '_' + context['middle_name'] + ".docx"
+            try:
+                self.word.save(f"./Документы/{name_f}")
+                # print(subprocess.Popen(r'explorer /select,"./Документы"'))
+                # self.mbox(f"Файл \"{name_f}\" успешно создан!", "Успех")
+            except Exception:
+                self.mbox(f"Файл с именем \"{name_f}\" открыт. Закройте его и перевыполните действие")
 
     def mbox_execute(self, body, title='Предупреждение'):
         dialog = QMessageBox()
