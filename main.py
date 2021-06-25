@@ -113,7 +113,7 @@ class HelperDoc(QtWidgets.QMainWindow):
 
     def add_row_excel(self):
         """
-        Lj
+        Запись строки из excel в бд и на экран
         :return:
         """
         current_row_position = self.ui.table.currentRow()
@@ -128,6 +128,9 @@ class HelperDoc(QtWidgets.QMainWindow):
         # self.helper.create_row(1)
 
     def clear_data(self):
+        """
+        Очистка боковой панели от введенных данных
+        """
         self.ui.title_doc_line.clear()
         self.ui.type_doc_line.clear()
         self.ui.status_doc_line.clear()
@@ -158,6 +161,9 @@ class HelperDoc(QtWidgets.QMainWindow):
         self.ui.financing_source_line.clear()
 
     def get_inputted_data(self):
+        """
+        Вернет полученные данные из боковой панели
+        """
         data = list()
         data.append(self.ui.title_doc_line.text())
         data.append(self.ui.type_doc_line.text())
@@ -199,6 +205,9 @@ class HelperDoc(QtWidgets.QMainWindow):
         return data
 
     def add_row(self):
+        """
+        Добавление строки в бд. Ввод организуется из боковой панели
+        """
         if self.mbox_execute("Вы уверены, что хотите добавить данные?"):
             # new_row_position = self.ui.table.currentRow() + 1
             new_row_position = self.ui.table.rowCount()
@@ -215,12 +224,21 @@ class HelperDoc(QtWidgets.QMainWindow):
                 self.mbox("Некоректный ввод данных")
 
     def includes_row(self, row, wanted):
+        """
+        Есть ли в списке row строка wanted.
+        param row: список
+        param wanted: строка которая ищется в списке row
+        return: True, если wanted есть в row. False, если нет
+        """
         for col in row:
             if wanted in str(col):
                 return True
         return False
 
     def find_rows(self):
+        """
+        Загружает все подходящие строки
+        """
         text = self.ui.suggest_input.text().strip()
         if text == '':
             self.load_data()
@@ -237,6 +255,9 @@ class HelperDoc(QtWidgets.QMainWindow):
                     self.ui.table.setItem(i, j, QtWidgets.QTableWidgetItem(need_rows[i][j]))
 
     def remove_row(self):
+        """
+        Удаление строки из бд и из GUI
+        """
         if self.mbox_execute("Вы уверены, что хотите удалить данные?"):
             if self.ui.table.rowCount() > 0:
                 current_row_position = self.ui.table.currentRow()
@@ -251,6 +272,9 @@ class HelperDoc(QtWidgets.QMainWindow):
                 self.mbox("Невозможно удалить, так как таблица пуста")
 
     def create_doc(self):
+        """
+        Создание документа по шаблону
+        """
         current_row_position = self.ui.table.currentRow()
         if current_row_position != -1:
             row = self.get_row_by_position(current_row_position, True)
@@ -278,6 +302,12 @@ class HelperDoc(QtWidgets.QMainWindow):
                 self.mbox(f"Файл с именем \"{name_f}\" открыт. Закройте его и перевыполните действие")
 
     def mbox_execute(self, body, title='Предупреждение'):
+        """
+        Диалоговое окно с выбором действия [Yes / No]
+        param body: Главный текст для сообщения
+        param title: Оглавление диалогового окна
+        return: True, если выбран 'Yes'. False, если 'No'
+        """
         dialog = QMessageBox()
         dialog.setText(body)
         dialog.setWindowTitle(title)
@@ -290,6 +320,11 @@ class HelperDoc(QtWidgets.QMainWindow):
             return False
 
     def mbox(self, body, title='Ошибка'):
+        """
+        Диалоговое окно
+        param body: Главный текст для сообщения
+        param title: Оглавление диалогового окна
+        """
         dialog = QMessageBox()
         dialog.setText(body)
         dialog.setWindowTitle(title)
