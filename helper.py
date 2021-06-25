@@ -14,6 +14,9 @@ class Helper:
 
     @staticmethod
     def get_profession(row, is_form_list=False):
+        """
+        return: Вернет список или словарь с необходимыми данными
+        """
         if is_form_list:
             return [row[11], row[12]]
 
@@ -23,6 +26,9 @@ class Helper:
         }
 
     def add_profession_bd(self, row):
+        """
+        Добавление данных в бд
+        """
         if row == -1:
             return False
 
@@ -41,6 +47,9 @@ class Helper:
         return is_added
 
     def del_profession_bd(self, row):
+        """
+        Удаление данных из бд
+        """
         is_del_success = False
 
         data = self.get_profession(row)
@@ -56,6 +65,9 @@ class Helper:
 
     @staticmethod
     def get_qualification(row, is_form_list=False):
+        """
+        return: Вернет список или словарь с необходимыми данными
+        """
         if is_form_list:
             return [row[13]]
         return {
@@ -63,6 +75,9 @@ class Helper:
         }
 
     def add_qualification_bd(self, row):
+        """
+        Добавление данных в бд
+        """
         if row == -1:
             return False
 
@@ -81,6 +96,9 @@ class Helper:
         return is_added
 
     def del_qualification_bd(self, row):
+        """
+        Удаление данных из бд
+        """
         is_del_success = False
 
         data = self.get_qualification(row)
@@ -97,6 +115,9 @@ class Helper:
 
     @staticmethod
     def get_education_program(row, is_form_list=False):
+        """
+        return: Вернет список или словарь с необходимыми данными
+        """
 
         if is_form_list:
             return [row[14]]
@@ -106,6 +127,9 @@ class Helper:
         }
 
     def add_education_program_bd(self, row):
+        """
+        Добавление данных в бд
+        """
         if row == -1:
             return False
 
@@ -124,6 +148,9 @@ class Helper:
         return is_added
 
     def del_education_program_bd(self, row):
+        """
+        Удаление данных из бд
+        """
         is_del_success = False
 
         data = self.get_education_program(row)
@@ -140,6 +167,9 @@ class Helper:
         return is_del_success
 
     def get_student(self, row, is_form_list=False):
+        """
+        return: Вернет список или словарь с необходимыми данными
+        """
         # qualification_id = self.bd.get_qualification_id(row[13])
         qualification_id = self.bd.get_id(self.table_qualification, 'id', {'title': row[13]})
         # education_program_id = self.bd.get_education_program_id(row[14])
@@ -178,6 +208,9 @@ class Helper:
         }
 
     def add_student_bd(self, row):
+        """
+        Добавление данных в бд
+        """
         if row == -1:
             return False
 
@@ -216,6 +249,9 @@ class Helper:
         return is_added
 
     def del_student_bd(self, row):
+        """
+        Удаление данных из бд
+        """
         data = self.get_student(row)
         if data == -1:
             return False
@@ -225,6 +261,9 @@ class Helper:
         return True
 
     def get_document(self, row, is_form_list=False):
+        """
+        return: Вернет список или словарь с необходимыми данными
+        """
         student = self.get_student(row)
         if student == -1:
             return -1
@@ -261,6 +300,9 @@ class Helper:
         }
 
     def add_document_bd(self, row):
+        """
+        Добавление данных в бд
+        """
         if row == -1:
             return False
 
@@ -294,6 +336,9 @@ class Helper:
         return is_added
 
     def del_document_bd(self, row):
+        """
+        Удаление данных из бд
+        """
         data = self.get_document(row)
         if data == -1:
             return False
@@ -304,6 +349,9 @@ class Helper:
         return True
 
     def add_all_bd(self, row):
+        """
+        Добавление всех данных в бд
+        """
         result_add = {
             'profession': self.add_profession_bd(self.get_profession(row)),
             'qualification': self.add_qualification_bd(self.get_qualification(row)),
@@ -315,6 +363,9 @@ class Helper:
         return bool(sum(result_add.values()))
 
     def del_all_bd(self, row):
+        """
+        Удаление полной строки из бд
+        """
         result_del = {
             'document': self.del_document_bd(row),
             'student': self.del_student_bd(row),
@@ -325,6 +376,9 @@ class Helper:
         return result_del['document']
 
     def create_row(self, pk_document):
+        """
+        Создание строки для удобного форматирования
+        """
         try:
             document = self.bd.select(self.table_document, '*', {'id': pk_document})[0]
             student = self.bd.select(self.table_student, '*', {'id': document[12]})[0]
@@ -349,6 +403,9 @@ class Helper:
             return -1
 
     def close(self):
+        """
+        Закрытие соединения с бд
+        """
         self.bd.close()
 
 
