@@ -69,7 +69,6 @@ class HelperDoc(QtWidgets.QMainWindow):
 
     def get_row_by_position(self, position, type_dict=False):
         """
-
         :param position: позиция нужной строки в бд
         :param type_dict: тип возвращаемых данных (true - dict; false - list)
         :return: Строка типа dict или list
