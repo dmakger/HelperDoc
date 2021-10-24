@@ -3,7 +3,7 @@ import openpyxl
 
 class Excel:
     def __init__(self, f):
-        self.book = openpyxl.open(f, read_only=True)
+        self.book = openpyxl.open(f)
         self.sheet = self.book.active
         self.title_row_num = 1
         self.min_col = 0

@@ -1,7 +1,8 @@
 import sys
-from PyQt6 import QtWidgets
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QMessageBox
+from PyQt5 import uic
+from PyQt5 import QtWidgets
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMessageBox
 from docxtpl import DocxTemplate
 # import subprocess
 
@@ -16,9 +17,9 @@ class HelperDoc(QtWidgets.QMainWindow):
         """
         Главный класс. Объединяет GUI и функциональную часть
         """
-        super().__init__()
+        super(HelperDoc, self).__init__()
 
-        self.excel = Excel("KKMT2020.xlsx")
+        self.excel = Excel("ККМТ2020.xlsx")
         self.helper = Helper('db.db')
         self.word = DocxTemplate("template.docx")
         self.excel.max_col = 28
@@ -258,11 +259,14 @@ class HelperDoc(QtWidgets.QMainWindow):
         Удаление строки из бд и из GUI
         """
         if self.mbox_execute("Вы уверены, что хотите удалить данные?"):
+            print(self.ui.table.rowCount())
             if self.ui.table.rowCount() > 0:
+                print("Hi")
+                print(self.ui.table.currentRow())
                 current_row_position = self.ui.table.currentRow()
                 print(current_row_position)
                 row = self.get_row_by_position(current_row_position)
-
+                print(row)
                 result = list()
                 result.append(self.helper.del_all_bd(row))
                 print(result)
