@@ -55,8 +55,7 @@ class Sqliter:
         try:
             with self.connection:
                 data = self.cursor.execute(
-                    "SELECT `id` FROM " + self.table_qualification + " WHERE `title` = \'" + title + "\'"
-                ).fetchall()
+                    f'SELECT `id` FROM {self.table_qualification} WHERE `title` = \'{title}\'').fetchall()
                 if len(data) != 0:
                     return data[0][0]
                 return -1
@@ -72,7 +71,7 @@ class Sqliter:
         is_valid = False
         try:
             with self.connection:
-                self.cursor.execute("INSERT INTO `" + self.table_qualification + "` (title) VALUES (?)", (title,))
+                self.cursor.execute(f"INSERT INTO `{self.table_qualification}` (title) VALUES (?)", (title,))
                 self.save()
                 is_valid = True
         except sqlite3.IntegrityError:
@@ -82,7 +81,7 @@ class Sqliter:
 
     def del_qualification(self, pk):
         with self.connection:
-            self.cursor.execute("DELETE FROM " + self.table_qualification + " WHERE `id` = " + pk)
+            self.cursor.execute(f'DELETE FROM {self.table_qualification} WHERE `id` = {pk}')
             self.save()
 
     def get_education_program_id(self, title):
@@ -94,7 +93,7 @@ class Sqliter:
         try:
             with self.connection:
                 data = self.cursor.execute(
-                    "SELECT `id` FROM " + self.table_education_program + " WHERE `title` = \'" + title + "\'").fetchall()
+                    f'SELECT `id` FROM {self.table_education_program} WHERE `title` = \'{title}\'').fetchall()
                 if len(data) != 0:
                     return data[0][0]
                 return -1
@@ -110,7 +109,7 @@ class Sqliter:
         is_valid = False
         try:
             with self.connection:
-                self.cursor.execute("INSERT INTO `" + self.table_education_program + "` (title) VALUES (?)", (title,))
+                self.cursor.execute(f"INSERT INTO `{self.table_education_program}` (title) VALUES (?)", (title,))
                 self.save()
                 is_valid = True
         except sqlite3.IntegrityError:
@@ -120,7 +119,7 @@ class Sqliter:
 
     def del_education_program(self, pk):
         with self.connection:
-            self.cursor.execute("DELETE FROM " + self.table_education_program + " WHERE `id` = " + pk)
+            self.cursor.execute(f'DELETE FROM {self.table_education_program} WHERE `id` = {pk}')
             self.save()
 
     def get_profession_id(self, title):
@@ -132,7 +131,7 @@ class Sqliter:
         try:
             with self.connection:
                 data = self.cursor.execute(
-                    "SELECT `code` FROM " + self.table_profession + " WHERE `title` = \'" + title + "\'").fetchall()
+                    f'SELECT `code` FROM {self.table_profession} WHERE `title` = \'{title}\'').fetchall()
                 if len(data) != 0:
                     return data[0][0]
                 return -1
@@ -148,7 +147,7 @@ class Sqliter:
         is_valid = False
         try:
             with self.connection:
-                self.cursor.execute("INSERT INTO `" + self.table_profession + "` (code, title) VALUES (?,?)", (code, title))
+                self.cursor.execute(f"INSERT INTO `{self.table_profession}` (code, title) VALUES (?,?)", (code, title))
                 self.save()
                 is_valid = True
         except sqlite3.IntegrityError:
@@ -158,7 +157,7 @@ class Sqliter:
 
     def del_profession(self, pk):
         with self.connection:
-            self.cursor.execute("DELETE FROM " + self.table_profession + " WHERE `code` = \'" + pk + "\'")
+            self.cursor.execute(f'DELETE FROM {self.table_profession} WHERE `code` = \'{pk}\'')
             self.save()
 
     def get_student_id(self, name, last_name, middle_name, birth_date, gender,
@@ -173,7 +172,7 @@ class Sqliter:
 
         try:
             with self.connection:
-                command = "SELECT `id` FROM " + self.table_student + " WHERE `name` = ? AND \
+                command = f'SELECT `id` FROM {self.table_student} WHERE `name` = ? AND \
                     `last_name` = ? AND `middle_name` = ? AND \
                     `birth_date` = ? AND `gender` = ? AND \
                     `snills` = ? AND `country_code` = ? AND \
@@ -185,7 +184,7 @@ class Sqliter:
                     `study_period` = ? AND \
                     `profession_code` = ? AND \
                     `qualification_id` = ? AND \
-                    `education_program_id` = ?"
+                    `education_program_id` = ?'
                 args = (
                     name, last_name, middle_name, birth_date, gender,
                     snills, country_code, education_form, education_receipt_form,
@@ -212,7 +211,7 @@ class Sqliter:
         is_valid = False
         try:
             with self.connection:
-                self.cursor.execute("INSERT INTO `" + self.table_student + "` (name, last_name, middle_name, birth_date, \
+                self.cursor.execute(f"INSERT INTO `{self.table_student}` (name, last_name, middle_name, birth_date, \
                 gender, snills, country_code, education_form, education_receipt_form, financing_source, \
                 admission_year, graduation_year, study_period, profession_code, qualification_id, \
                 education_program_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
@@ -229,7 +228,7 @@ class Sqliter:
 
     def del_student(self, pk):
         with self.connection:
-            self.cursor.execute("DELETE FROM " + self.table_student + " WHERE `id` = " + pk)
+            self.cursor.execute(f'DELETE FROM {self.table_student} WHERE `id` = {pk}')
             self.save()
 
     def get_document_id(self, title, type, series, number, loss_confirmation, exchange_confirmation,
@@ -243,14 +242,14 @@ class Sqliter:
         try:
             with self.connection:
                 data = self.cursor.execute(
-                    "SELECT `id` FROM " + self.table_document + " WHERE `title` = \'" + title + "\' AND \
-                    `type` = \'" + type + "\' AND `series` = \'" + series + "\' AND \
-                    `number` = \'" + number + "\' AND `loss_confirmation` = \'" + loss_confirmation + "\' AND \
-                    `exchange_confirmation` = \'" + exchange_confirmation + "\' AND \
-                    `destruction_confirmation` = \'" + destruction_confirmation + "\' AND \
-                    `education_level` = \'" + education_level + "\' AND  `issue_date` = \'" + issue_date + "\' AND \
-                    `registration_number` = \'" + registration_number + "\' AND `status` = \'" + status + "\' AND \
-                    `student_id` = \'" + student_id + "\'").fetchall()
+                    f'SELECT `id` FROM {self.table_document} WHERE `title` = \'{title}\' AND \
+                    `type` = \'{type}\' AND `series` = \'{series}\' AND \
+                    `number` = \'{number}\' AND `loss_confirmation` = \'{loss_confirmation}\' AND \
+                    `exchange_confirmation` = \'{exchange_confirmation}\' AND \
+                    `destruction_confirmation` = \'{destruction_confirmation}\' AND \
+                    `education_level` = \'{education_level}\' AND  `issue_date` = \'{issue_date}\' AND \
+                    `registration_number` = \'{registration_number}\' AND `status` = \'{status}\' AND \
+                    `student_id` = \'{student_id}\'').fetchall()
                 if len(data) != 0:
                     return data[0][0]
                 return -1
@@ -268,7 +267,7 @@ class Sqliter:
         is_valid = False
         try:
             with self.connection:
-                self.cursor.execute("INSERT INTO `" + self.table_document + "` (title, type, series, number, \
+                self.cursor.execute(f"INSERT INTO `{self.table_document}` (title, type, series, number, \
                 loss_confirmation, exchange_confirmation, destruction_confirmation, education_level, issue_date, \
                 registration_number,status, student_id) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", (title, type, series, number,
                                                                                             loss_confirmation,
@@ -287,7 +286,7 @@ class Sqliter:
 
     def del_document(self, pk):
         with self.connection:
-            self.cursor.execute("DELETE FROM " + self.table_document + " WHERE `id` = " + pk)
+            self.cursor.execute(f'DELETE FROM {self.table_document} WHERE `id` = {pk}')
             self.save()
 
     def get_id(self, table: str, name_pk: str, data: dict):
@@ -298,7 +297,7 @@ class Sqliter:
 
         try:
             with self.connection:
-                command = "SELECT `" + name_pk + "` FROM `" + table + "`"
+                command = f"SELECT `{name_pk}` FROM `{table}`"
                 count = len(data)
                 if count == 0:
                     return -1
@@ -307,12 +306,10 @@ class Sqliter:
                 for key, value in data.items():
                     count -= 1
                     if value is not None:
-                        command += "`" + key + "` = ?"
+                        command += f"`{key}` = ?"
                         column_values.append(value)
                         if count:
                             command += " AND "
-                print(command)
-                print(tuple(column_values))
                 need_id = self.cursor.execute(command, tuple(column_values)).fetchall()
                 if len(need_id) != 0:
                     return need_id[0][0]
@@ -328,7 +325,7 @@ class Sqliter:
 
         try:
             with self.connection:
-                return self.cursor.execute("SELECT MAX(" + name_pk + ") FROM `" + table + "`").fetchall()[0][0]
+                return self.cursor.execute(f"SELECT MAX({name_pk}) FROM {table}").fetchall()[0][0]
         except sqlite3.IntegrityError:
             return -1
 
@@ -341,14 +338,14 @@ class Sqliter:
 
         try:
             with self.connection:
-                command = "SELECT " + need + " FROM `" + table + "`"
+                command = f"SELECT {need} FROM `{table}`"
                 if len(data) == 0:
                     return self.cursor.execute(command).fetchall()
                 command += " WHERE "
                 column_values = list()
                 count = len(data)
                 for key, value in data.items():
-                    command += "`" + key + "` = ?"
+                    command += f"`{key}` = ?"
                     column_values.append(value)
                     count -= 1
                     if count:
@@ -370,15 +367,15 @@ class Sqliter:
         try:
             with self.connection:
                 column_values = list()
-                command = "UPDATE `" + table + "`"
+                command = f"UPDATE `{table}`"
 
                 key_pk = list(pk.keys())[0]
-                command += " SET `" + key_pk + "` WHERE "
+                command += f" SET `{key_pk}` WHERE "
                 column_values.append(pk[key_pk])
                 count = len(data)
                 for key, value in data.items():
                     column_values.append(value)
-                    command += "`" + key + "` = ?"
+                    command += f"`{key}` = ?"
                     count -= 1
                     if count:
                         command += ", "

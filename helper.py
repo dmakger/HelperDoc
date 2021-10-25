@@ -345,9 +345,7 @@ class Helper:
         # pk = self.bd.get_document_id(*data)
         pk = self.bd.get_id(self.table_document, 'id', data)
 
-        print(pk)
         self.bd.del_document(pk)
-        print(pk)
         return True
 
     def add_all_bd(self, row):
@@ -368,12 +366,6 @@ class Helper:
         """
         Удаление полной строки из бд
         """
-        print(row)
-        print('document' + self.del_document_bd(row))
-        print('student' + self.del_student_bd(row))
-        print('education_program' + self.del_education_program_bd(row))
-        print('qualification' + self.del_qualification_bd(row))
-        print('profession' + self.del_profession_bd(row))
         result_del = {
             'document': self.del_document_bd(row),
             'student': self.del_student_bd(row),
@@ -397,7 +389,7 @@ class Helper:
                 document[1], document[2], document[11],
                 document[5], document[6], document[7],
                 document[8], document[3], document[4],
-                document[9], document[10], profession[0],
+                document[9], document[10], profession[0], 
                 profession[1], qualification[1],
                 education_program[1], student[11], student[12],
                 student[13], student[2], student[1],

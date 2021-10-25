@@ -1,9 +1,9 @@
 import sys
-from PyQt5 import uic
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMessageBox
 from docxtpl import DocxTemplate
+import jinja2
 # import subprocess
 
 from design import Ui_HelperDoc
@@ -259,14 +259,11 @@ class HelperDoc(QtWidgets.QMainWindow):
         Удаление строки из бд и из GUI
         """
         if self.mbox_execute("Вы уверены, что хотите удалить данные?"):
-            print(self.ui.table.rowCount())
             if self.ui.table.rowCount() > 0:
-                print("Hi")
-                print(self.ui.table.currentRow())
                 current_row_position = self.ui.table.currentRow()
                 print(current_row_position)
                 row = self.get_row_by_position(current_row_position)
-                print(row)
+
                 result = list()
                 result.append(self.helper.del_all_bd(row))
                 print(result)
@@ -334,8 +331,9 @@ class HelperDoc(QtWidgets.QMainWindow):
         dialog.exec()
 
 
-app = QtWidgets.QApplication([])
-application = HelperDoc()
-application.show()
+if __name__ == '__main__':
+    app = QtWidgets.QApplication([])
+    application = HelperDoc()
+    application.show()
 
-sys.exit(app.exec())
+    sys.exit(app.exec())
